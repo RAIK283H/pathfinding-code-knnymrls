@@ -50,7 +50,7 @@ quit_button = pyglet.gui.widgets.PushButton(20, 20,
 
 def update(change_in_time):
     scoreboard.update_scoreboard()
-    graph.update_graph()
+    graph.update_graph() # type: ignore
     for player_object in global_game_data.player_objects:
         player_object.update(change_in_time)
 
@@ -89,7 +89,7 @@ def change_graph():
     for player_object in global_game_data.player_objects:
         player_object.reset_player()
     global_game_data.current_player_index = 0
-    graph.set_up_graph()
+    graph.set_up_graph() # type: ignore
     pathing.set_current_graph_paths()
 
 
