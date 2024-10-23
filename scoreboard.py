@@ -122,10 +122,20 @@ class Scoreboard:
 
     def update_winner(self):
         display_element, _ = self.winner_display
-        player_nodes_visited = {player[0]: len(global_game_data.graph_paths[index]) for index, player in enumerate(config_data.player_data)}
+    
+        # This filters out the Test Player since that woulld alwasy be the winner
+        player_nodes_visited = {
+        player[0]: len(global_game_data.graph_paths[index]) 
+        for index, player in enumerate(config_data.player_data)
+        if player[0] != "Test"  # Exclude "Test" player
+        }
 
-        winner_player_name = min(player_nodes_visited, key=player_nodes_visited.get) # type: ignore
-        display_element.text = "Winner: " + winner_player_name
+        # Determine the winner by the player with the minimum nodes visited since the distance isn't calculated at the start
+        if player_nodes_visited: 
+            winner_player_name = min(player_nodes_visited, key=player_nodes_visited.get)  # type: ignore
+            display_element.text = "Winner: " + winner_player_name
+        else:
+            display_element.text = "Winner: N/A"
 
     def update_scoreboard(self):
         self.update_elements_locations()

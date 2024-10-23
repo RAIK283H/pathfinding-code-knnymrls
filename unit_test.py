@@ -1,6 +1,6 @@
 import math
 import unittest
-from pathing import get_random_adjacent_node, get_random_path
+from pathing import get_bfs_path, get_dfs_path, get_random_adjacent_node, get_random_path
 import global_game_data
 
 class TestPathFinding(unittest.TestCase):
@@ -42,6 +42,23 @@ class TestPathFinding(unittest.TestCase):
         random_path = get_random_path()
         self.assertEqual(random_path[0], 0, "Path should start at node 0.")
         self.assertEqual(random_path[-1], 2, "Path should end at node 2 (the exit node).")
+        
+    def test_bfs_path_basic(self):
+        bfs_path = get_bfs_path()
+        
+        self.assertEqual(bfs_path[0], 0, "BFS path should start at node 0.")
+        self.assertIn(2, bfs_path, "BFS path should include the target node (2).")
+        self.assertEqual(bfs_path[-1], 2, "BFS path should end at node 2 (the exit node).")
+        self.assertEqual(len(bfs_path), len(set(bfs_path)), "BFS path should not contain any repeated nodes.")
+        self.assertEqual(len(bfs_path), 3, "BFS path should have a length of 3.")
 
+    def test_dfs_path_basic(self):
+        dfs_path = get_dfs_path()
+        
+        self.assertEqual(dfs_path[0], 0, "DFS path should start at node 0.")
+        self.assertIn(2, dfs_path, "DFS path should include the target node (2).")
+        self.assertEqual(dfs_path[-1], 2, "DFS path should end at node 2 (the exit node).")
+        self.assertEqual(len(dfs_path), 3, "DFS path should have a length of 3.")
+        
 if __name__ == '__main__':
     unittest.main()
