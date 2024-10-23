@@ -7,6 +7,13 @@ import graph_data
 
 
 class Scoreboard:
+    player_name_display = []
+    player_traveled_display = []
+    player_excess_distance_display = []
+    player_path_display = []
+    player_nodes_visited_display = []
+    winner_display = []
+
     def __init__(self, batch, group):
         self.batch = batch
         self.group = group
@@ -18,33 +25,44 @@ class Scoreboard:
         self.distance_to_exit_label = pyglet.text.Label('Direct Distance To Exit : 0', x=0, y=0,
                                                         font_name='Arial', font_size=self.font_size, batch=batch, group=group)
         self.distance_to_exit = 0
-        self.player_name_display = []  # Initialize here
-        self.player_traveled_display = []  # Initialize here
-        self.player_excess_distance_display = []  # Initialize here
-        self.player_path_display = []  # Initialize here
-        self.player_nodes_visited_display = []  # Initialize here
-        
         for index, player in enumerate(config_data.player_data):
-            player_name_label = pyglet.text.Label(
-                str(index + 1) + " " + player[0], x=0, y=0, font_name='Arial',
-                font_size=self.font_size, batch=batch, group=group, color=player[2][colors.TEXT_INDEX])
+            player_name_label = pyglet.text.Label(str(index + 1) + " " + player[0],
+                                                  x=0,
+                                                  y=0,
+                                                  font_name='Arial',
+                                                  font_size=self.font_size, batch=batch, group=group, color=player[2][colors.TEXT_INDEX])
             self.player_name_display.append((player_name_label, player))
-            
-            traveled_distance_label = pyglet.text.Label("Distance Traveled:", x=0, y=0, 
-                                                        font_name='Arial', font_size=self.font_size, batch=batch, group=group, color=player[2][colors.TEXT_INDEX])
+            traveled_distance_label = pyglet.text.Label("Distance Traveled:",
+                                                        x=0,
+                                                        y=0,
+                                                        font_name='Arial',
+                                                        font_size=self.font_size, batch=batch, group=group, color=player[2][colors.TEXT_INDEX])
             self.player_traveled_display.append((traveled_distance_label, player))
-            
-            excess_distance_label = pyglet.text.Label("Excess Distance Traveled:", x=0, y=0, 
-                                                      font_name='Arial', font_size=self.font_size, batch=batch, group=group, color=player[2][colors.TEXT_INDEX])
-            self.player_excess_distance_display.append((excess_distance_label, player))
-            
-            # Initialize and append path_label and nodes_visited_label correctly
-            path_label = pyglet.text.Label("Path: ", x=0, y=0, font_name='Arial', font_size=self.font_size, batch=batch, group=group, color=player[2][colors.TEXT_INDEX])
-            self.player_path_display.append((path_label, player))
-            
-            nodes_visited_label = pyglet.text.Label("Nodes Visited: 0", x=0, y=0, font_name='Arial', font_size=self.font_size, batch=batch, group=group, color=player[2][colors.TEXT_INDEX])
-            self.player_nodes_visited_display.append((nodes_visited_label, player))
+            excess_distance_label = pyglet.text.Label("Excess Distance Traveled:",
+                                                      x=0,
+                                                      y=0,
+                                                      font_name='Arial',
+                                                      font_size=self.font_size, batch=batch, group=group, color=player[2][colors.TEXT_INDEX])
 
+            self.player_excess_distance_display.append((excess_distance_label, player))
+            path_label = pyglet.text.Label("",
+                                           x=0,
+                                           y=0,
+                                           font_name='Arial',
+                                           font_size=self.font_size, batch=batch, group=group, color=player[2][colors.TEXT_INDEX])
+            self.player_path_display.append((path_label, player))
+            nodes_visited_label = pyglet.text.Label("", 
+                                                    x=0, 
+                                                    y=0,
+                                                    font_name='Arial', 
+                                                    font_size=self.font_size, batch=batch, group=group, color=player[2][colors.TEXT_INDEX])
+            self.player_nodes_visited_display.append((nodes_visited_label, player))
+        winner_label = pyglet.text.Label("", 
+                                         x=0, 
+                                         y=0,
+                                         font_name='Arial', 
+                                         font_size=self.font_size, batch=batch, group=group)
+        self.winner_display = (winner_label, player)
 
     def update_elements_locations(self):
         self.distance_to_exit_label.x = config_data.window_width - self.stat_width
@@ -65,6 +83,10 @@ class Scoreboard:
             display_element.x = config_data.window_width - self.stat_width
             display_element.y = config_data.window_height - self.base_height_offset - self.stat_height * 6 - self.stat_height * (index * self.number_of_stats)
 
+        display_element = self.winner_display[0]
+        display_element.x = config_data.window_width - self.stat_width
+        display_element.y = config_data.window_height - self.stat_height * 24
+
     def update_paths(self):
         for index in range(len(config_data.player_data)):
             self.player_path_display[index][0].text = self.wrap_text(str(global_game_data.graph_paths[index]))
@@ -76,12 +98,6 @@ class Scoreboard:
         end_y = graph_data.graph_data[global_game_data.current_graph_index][-1][0][1]
         self.distance_to_exit = math.sqrt(pow(start_x - end_x, 2) + pow(start_y - end_y, 2))
         self.distance_to_exit_label.text = 'Direct Distance To Exit : ' + "{0:.0f}".format(self.distance_to_exit)
-    
-    # function to update the nodes visited
-    def update_nodes_visited(self):
-        for index, (label, player) in enumerate(self.player_nodes_visited_display):
-            num_nodes_visited = len(global_game_data.graph_paths[index])  # Count the nodes in the player's path
-            label.text = f"Nodes Visited: {num_nodes_visited}"
 
     def wrap_text(self, input):
         wrapped_text = (input[:44] + ', ...]') if len(input) > 44 else input
@@ -98,9 +114,23 @@ class Scoreboard:
                 if player_object.player_config_data == player_configuration_info:
                     display_element.text = "Excess Distance Traveled: " + str(max(0, int(player_object.distance_traveled-self.distance_to_exit)))
 
+    def update_nodes_visited(self):
+        for display_element, player_configuration_info in self.player_nodes_visited_display:
+            for player_object in global_game_data.player_objects:
+                if player_object.player_config_data == player_configuration_info:
+                    display_element.text = "Nodes Visited: " + str(len(global_game_data.graph_paths[global_game_data.player_objects.index(player_object)]))
+
+    def update_winner(self):
+        display_element, _ = self.winner_display
+        player_nodes_visited = {player[0]: len(global_game_data.graph_paths[index]) for index, player in enumerate(config_data.player_data)}
+
+        winner_player_name = min(player_nodes_visited, key=player_nodes_visited.get) # type: ignore
+        display_element.text = "Winner: " + winner_player_name
+
     def update_scoreboard(self):
         self.update_elements_locations()
         self.update_paths()
         self.update_distance_to_exit()
         self.update_distance_traveled()
         self.update_nodes_visited()
+        self.update_winner()
