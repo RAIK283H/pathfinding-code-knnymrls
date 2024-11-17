@@ -9,11 +9,15 @@ from player_object import Player
 import random
 
 # Create Viewing Window
-window = pyglet.window.Window(width=config_data.window_width, height=config_data.window_height,
-                              caption='RAIK283H Project Code', resizable=True)
+window = pyglet.window.Window(
+    width=config_data.window_width,
+    height=config_data.window_height,
+    caption="RAIK283H Project Code",
+    resizable=True,
+)
 
 # Set Path
-pyglet.resource.path = ['./resources']
+pyglet.resource.path = ["./resources"]
 pyglet.resource.reindex()
 
 # Set Layers
@@ -34,23 +38,33 @@ for graph in graph_data:
 scoreboard = Scoreboard(main_batch, text_display_area)
 graph = Graph(main_batch)
 for player_index, player in enumerate(config_data.player_data):
-    global_game_data.player_objects.append(Player(player, player_index, main_batch, player_layer))
+    global_game_data.player_objects.append(
+        Player(player, player_index, main_batch, player_layer)
+    )
 
-new_graph_button = pyglet.gui.widgets.PushButton(160, 20,
-                                                 pressed=pyglet.resource.image('new_graph_pressed.png'),
-                                                 depressed=pyglet.resource.image('new_graph.png'),
-                                                 hover=pyglet.resource.image('new_graph.png'),
-                                                 batch=main_batch, group=button_display_area)
-quit_button = pyglet.gui.widgets.PushButton(20, 20,
-                                            pressed=pyglet.resource.image('button_quit_pressed.png'),
-                                            depressed=pyglet.resource.image('button_quit_normal.png'),
-                                            hover=pyglet.resource.image('button_quit_normal.png'), batch=main_batch,
-                                            group=button_display_area)
+new_graph_button = pyglet.gui.widgets.PushButton(
+    160,
+    20,
+    pressed=pyglet.resource.image("new_graph_pressed.png"),
+    depressed=pyglet.resource.image("new_graph.png"),
+    hover=pyglet.resource.image("new_graph.png"),
+    batch=main_batch,
+    group=button_display_area,
+)
+quit_button = pyglet.gui.widgets.PushButton(
+    20,
+    20,
+    pressed=pyglet.resource.image("button_quit_pressed.png"),
+    depressed=pyglet.resource.image("button_quit_normal.png"),
+    hover=pyglet.resource.image("button_quit_normal.png"),
+    batch=main_batch,
+    group=button_display_area,
+)
 
 
 def update(change_in_time):
     scoreboard.update_scoreboard()
-    graph.update_graph() # type: ignore
+    graph.update_graph()  # type: ignore
     for player_object in global_game_data.player_objects:
         player_object.update(change_in_time)
 
@@ -63,11 +77,16 @@ def on_resize(width, height):
 
 @window.event
 def on_mouse_press(x, y, button, modifiers):
-    if new_graph_button.aabb[0] <= x <= new_graph_button.aabb[2] and new_graph_button.aabb[1] <= y <= \
-            new_graph_button.aabb[3]:
+    if (
+        new_graph_button.aabb[0] <= x <= new_graph_button.aabb[2]
+        and new_graph_button.aabb[1] <= y <= new_graph_button.aabb[3]
+    ):
         new_graph_button.value = True
         change_graph()
-    if quit_button.aabb[0] <= x <= quit_button.aabb[2] and quit_button.aabb[1] <= y <= quit_button.aabb[3]:
+    if (
+        quit_button.aabb[0] <= x <= quit_button.aabb[2]
+        and quit_button.aabb[1] <= y <= quit_button.aabb[3]
+    ):
         window.close()
 
 
@@ -89,10 +108,10 @@ def change_graph():
     for player_object in global_game_data.player_objects:
         player_object.reset_player()
     global_game_data.current_player_index = 0
-    graph.set_up_graph() # type: ignore
+    graph.set_up_graph()  # type: ignore
     pathing.set_current_graph_paths()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pyglet.clock.schedule_interval(update, 1 / 120.0)
     pyglet.app.run()

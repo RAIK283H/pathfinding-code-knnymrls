@@ -1,8 +1,10 @@
 import math
 import unittest
+import graph_data
 from pathing import (
     get_bfs_path,
     get_dfs_path,
+    get_dijkstra_path,
     get_random_adjacent_node,
     get_random_path,
 )
@@ -134,6 +136,38 @@ class TestPathFinding(unittest.TestCase):
         perms = permutation.find_cycles(graph)
 
         assert cycles == perms, "Failed to produce all permutations"
+
+    def test_dijkstra_path_basic(self):
+        # Mock the global_game_data and graph_data
+        global_game_data.current_graph_index = 0
+        global_game_data.target_node = [1]
+        graph_data.graph_data = [
+            [
+                ((0, 0), [1, 2]),  # Node 0: Coordinate (0, 0), Neighbors [1, 2]
+                ((1, 0), [0, 2]),  # Node 1: Coordinate (1, 0), Neighbors [0, 2]
+                ((2, 0), [0, 1]),  # Node 2: Coordinate (2, 0), Neighbors [0, 1]
+            ]
+        ]
+
+        # Call the Dijkstra's function
+        dijkstra_path = get_dijkstra_path()
+
+        # Assertions for correctness
+        self.assertEqual(dijkstra_path[0], 0, "Dijkstra path should start at node 0.")
+        self.assertEqual(
+            dijkstra_path[-1], 2, "Dijkstra path should end at the exit node (2)."
+        )
+        self.assertIn(
+            1, dijkstra_path, "Dijkstra path should include the target node (1)."
+        )
+        self.assertEqual(
+            len(dijkstra_path), 3, "Dijkstra path should have a length of 3."
+        )
+        self.assertEqual(
+            len(set(dijkstra_path)),
+            len(dijkstra_path),
+            "Dijkstra path should not contain repeated nodes.",
+        )
 
 
 if __name__ == "__main__":
